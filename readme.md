@@ -18,15 +18,16 @@ A modern full-stack e-commerce application built for beginners learning full-sta
 
 ## 🌟 Overview
 
-Ecomm Oceano is a comprehensive e-commerce platform designed to help developers understand modern full-stack development practices. The application features a microservices backend architecture with Node.js and Express.js, MongoDB for data persistence, and a Next.js frontend with micro-frontend architecture.
+Ecomm Oceano is a comprehensive e-commerce platform designed to help developers understand modern full-stack development practices. The application features a microservices backend architecture with Node.js, Express.js, TypeScript, MySQL for data persistence, and a Next.js frontend with micro-frontend architecture.
 
 ## 🛠 Tech Stack
 
 ### Backend
 - **Node.js** - Runtime environment
 - **Express.js** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
+- **TypeScript** - Type-safe JavaScript
+- **MySQL** - Relational database
+- **mysql2** - MySQL client for Node.js
 - **Microservices** - Distributed architecture
 
 ### Frontend
@@ -51,9 +52,10 @@ Ecomm Oceano is a comprehensive e-commerce platform designed to help developers 
 
 Before running this application, make sure you have the following installed:
 
-- **Node.js** (v16 or higher)
+- **Node.js** (v18 or higher)
 - **npm** or **yarn**
-- **MongoDB** (local or cloud instance)
+- **MySQL** (v8.0 or higher)
+- **TypeScript** (v5.0 or higher)
 - **Git**
 
 ## 🚀 Installation
@@ -66,70 +68,118 @@ Before running this application, make sure you have the following installed:
 
 2. **Install dependencies**
    ```bash
-   npm install
+   # Install root dependencies
+   yarn install
+   
+   # Install backend dependencies
+   cd backend
+   yarn install
    ```
 
-3. **Set up environment variables**
+3. **Set up MySQL database**
+   ```bash
+   # Login to MySQL
+   mysql -u root -p
+   
+   # Create database
+   CREATE DATABASE ecomm_oceano;
+   
+   # Create a user (optional)
+   CREATE USER 'ecomm_user'@'localhost' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON ecomm_oceano.* TO 'ecomm_user'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+4. **Set up environment variables**
    ```bash
    cp .env.example .env
    ```
-   Update the `.env` file with your configuration:
+   Update the `.env` file with your MySQL configuration:
    ```env
    # Database
-   MONGODB_URI=mongodb://localhost:27017/ecomm-oceano
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=your_mysql_password
+   DB_NAME=ecomm_oceano
+   DB_PORT=3306
    
    # JWT
    JWT_SECRET=your-secret-key
    
    # Server
-   PORT=3000
+   PORT=5000
    NODE_ENV=development
    ```
 
-4. **Start the development server**
+5. **Build and start the development server**
    ```bash
-   npm run dev
+   # Development mode with TypeScript
+   yarn dev
+   
+   # Or build and run production
+   yarn build
+   yarn start
    ```
 
 ## 🎯 Usage
 
-1. **Start the application**
+1. **Start the backend server (Development)**
    ```bash
-   npm start
+   yarn dev
+   # or
+   cd backend && yarn dev
    ```
 
-2. **Access the application**
-   - Frontend: `http://localhost:3000`
-   - API: `http://localhost:3000/api`
+2. **Build for production**
+   ```bash
+   yarn build
+   # or
+   cd backend && yarn build
+   ```
 
-3. **Admin Panel**
+3. **Start production server**
+   ```bash
+   yarn start
+   # or
+   cd backend && yarn start
+   ```
+
+4. **Access the application**
+   - Backend API: `http://localhost:5000`
+   - Health Check: `http://localhost:5000/health`
+
+5. **Frontend (when implemented)**
+   - Frontend: `http://localhost:3000`
+
+6. **Admin Panel (when implemented)**
    - Access: `http://localhost:3000/admin`
-   - Default credentials: (To be configured)
 
 ## 📁 Project Structure
 
 ```
 ecomm-oceano/
 ├── backend/
-│   ├── services/
-│   │   ├── user-service/
-│   │   ├── product-service/
-│   │   ├── order-service/
-│   │   └── payment-service/
-│   ├── shared/
+│   ├── src/
+│   │   ├── index.ts          # Main TypeScript entry point
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
 │   │   ├── middleware/
-│   │   ├── utils/
-│   │   └── config/
-│   └── gateway/
+│   │   ├── types/            # TypeScript type definitions
+│   │   └── utils/
+│   ├── dist/                 # Compiled JavaScript output
+│   ├── tsconfig.json         # TypeScript configuration
+│   └── package.json
 ├── frontend/
 │   ├── components/
 │   ├── pages/
 │   ├── styles/
 │   ├── utils/
-│   └── public/
+│   ├── public/
+│   └── package.json
 ├── docs/
 ├── tests/
-├── package.json
 ├── README.md
 └── .env.example
 ```
@@ -154,7 +204,54 @@ ecomm-oceano/
 - `GET /api/orders/:id` - Get order by ID
 - `PUT /api/orders/:id` - Update order status
 
+### System Endpoints
+- `GET /` - Basic server info
+- `GET /health` - Health check and database status
+
 For detailed API documentation, visit `/api/docs` when the server is running.
+
+## 🗄️ Database Schema
+
+### Users Table
+```sql
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('user', 'admin') DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+### Products Table
+```sql
+CREATE TABLE products (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  price DECIMAL(10, 2) NOT NULL,
+  stock_quantity INT DEFAULT 0,
+  category_id INT,
+  image_url VARCHAR(500),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+### Orders Table
+```sql
+CREATE TABLE orders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  total_amount DECIMAL(10, 2) NOT NULL,
+  status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
 
 ## 🧪 Testing
 
@@ -162,13 +259,13 @@ Run the test suite:
 
 ```bash
 # Run all tests
-npm test
+yarn test
 
 # Run tests in watch mode
-npm run test:watch
+yarn test:watch
 
 # Run tests with coverage
-npm run test:coverage
+yarn test:coverage
 ```
 
 ## 🚀 Deployment
@@ -180,16 +277,16 @@ npm run test:coverage
    docker build -t ecomm-oceano .
    ```
 
-2. **Run the container**
+2. **Run with Docker Compose (with MySQL)**
    ```bash
-   docker run -p 3000:3000 ecomm-oceano
+   docker-compose up -d
    ```
 
 ### Using PM2
 
 1. **Install PM2**
    ```bash
-   npm install -g pm2
+   yarn global add pm2
    ```
 
 2. **Start the application**
