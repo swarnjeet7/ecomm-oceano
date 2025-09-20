@@ -1,0 +1,43 @@
+{
+  "name": "ecomm-oceano",
+  "version": "1.0.0",
+  "description": "This is e-commerce application for beginners full stack developer. Backend is built using Node.js, Express.js, MongoDB, Mongoose, Microservices and Frontend is built using Next.js and Micro frontend.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swarnjeet7/ecomm-oceano.git"
+  },
+  "keywords": [
+    "ecommerce",
+    "fullstack",
+    "microservices",
+    "nodejs",
+    "expressjs",
+    "mongodb",
+    "mongoose",
+    "nextjs",
+    "microfrontend",
+    "react"
+  ],
+  "author": "Swarnjeet Singh",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/swarnjeet7/ecomm-oceano/issues"
+  },
+  "homepage": "https://github.com/swarnjeet7/ecomm-oceano#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

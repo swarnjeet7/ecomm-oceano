@@ -1,0 +1,29 @@
+{
+  "name": "ecomm-oceano",
+  "version": "1.0.0",
+  "description": "This is e-commerce application for beginners those who are learning backend development. We are using Node.js, Express.js, MongoDB, Mongoose, Microservices.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swarnjeet7/ecomm-oceano.git"
+  },
+  "keywords": [
+    "ecommerce",
+    "fullstack",
+    "microservices",
+    "nodejs",
+    "expressjs",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "Swarnjeet Singh",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/swarnjeet7/ecomm-oceano/issues"
+  },
+  "homepage": "https://github.com/swarnjeet7/ecomm-oceano#readme"
+}
