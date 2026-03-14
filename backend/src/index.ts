@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
-import bcrypt from "bcrypt";
+import userRouter from "./routes/user";
 
 dotenv.config();
 
@@ -28,7 +28,7 @@ const dbConfig: DatabaseConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "root@123",
-  database: process.env.DB_NAME || "todos",
+  database: process.env.DB_NAME || "oceano",
   port: parseInt(process.env.DB_PORT || "3306"),
   waitForConnections: true,
   connectionLimit: 10,
@@ -55,6 +55,8 @@ async function testConnection(): Promise<void> {
 // Initialize database connection
 testConnection();
 
+app.use("/user", userRouter);
+
 // Basic route
 app.get("/", (req: Request, res: Response) => {
   res.json({
@@ -70,44 +72,6 @@ interface LoginRequest {
   email: string;
   password: string;
 }
-
-// User login endpoint
-app.post(
-  "/user/login",
-  async (req: Request<{}, {}, LoginRequest>, res: Response) => {
-    try {
-      const { email, password } = req.body;
-
-      // Basic validation
-      if (!email || !password) {
-        return res.status(400).json({
-          success: false,
-          message: "Email and password are required",
-        });
-      }
-
-      // TODO: Implement actual user authentication logic
-      // For now, just demonstrating bcrypt usage
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-      res.json({
-        success: true,
-        message: "Login endpoint working with TypeScript!",
-        data: {
-          email,
-          hashedPassword: hashedPassword.substring(0, 20) + "...", // Show partial hash for demo
-        },
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
-    }
-  }
-);
 
 // Health check route
 app.get("/health", async (req: Request, res: Response) => {

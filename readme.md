@@ -82,11 +82,11 @@ Before running this application, make sure you have the following installed:
    mysql -u root -p
    
    # Create database
-   CREATE DATABASE ecomm_oceano;
+   CREATE DATABASE oceano;
    
    # Create a user (optional)
-   CREATE USER 'ecomm_user'@'localhost' IDENTIFIED BY 'your_password';
-   GRANT ALL PRIVILEGES ON ecomm_oceano.* TO 'ecomm_user'@'localhost';
+   CREATE USER 'oceano_user'@'localhost' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON oceano.* TO 'oceano_user'@'localhost';
    FLUSH PRIVILEGES;
    ```
 
@@ -96,19 +96,23 @@ Before running this application, make sure you have the following installed:
    ```
    Update the `.env` file with your MySQL configuration:
    ```env
-   # Database
+   # Database Configuration
    DB_HOST=localhost
    DB_USER=root
    DB_PASSWORD=your_mysql_password
-   DB_NAME=ecomm_oceano
+   DB_NAME=oceano
    DB_PORT=3306
    
-   # JWT
-   JWT_SECRET=your-secret-key
-   
-   # Server
+   # Server Configuration
    PORT=5000
    NODE_ENV=development
+   
+   # Security (for future JWT implementation)
+   JWT_SECRET=your_jwt_secret_key_here
+   JWT_EXPIRES_IN=24h
+   
+   # CORS Configuration (optional)
+   ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
    ```
 
 5. **Build and start the development server**
@@ -186,29 +190,108 @@ ecomm-oceano/
 
 ## 📚 API Documentation
 
+### Base URL
+```
+http://localhost:5000
+```
+
 ### Authentication Endpoints
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
 
-### Product Endpoints
-- `GET /api/products` - Get all products
-- `GET /api/products/:id` - Get product by ID
-- `POST /api/products` - Create new product (Admin)
-- `PUT /api/products/:id` - Update product (Admin)
-- `DELETE /api/products/:id` - Delete product (Admin)
+#### User Registration
+- **POST** `/user/register`
+- **Description**: Register a new user account
+- **Request Body**:
+  ```json
+  {
+    "fullname": "John Doe",
+    "email": "john@example.com",
+    "password": "password123"
+  }
+  ```
+- **Success Response** (201):
+  ```json
+  {
+    "success": true,
+    "message": "User registered successfully!",
+    "data": {
+      "id": 1,
+      "fullname": "John Doe",
+      "email": "john@example.com",
+      "created_at": "2025-09-21T17:15:03.000Z"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: Missing required fields or invalid email format
+  - `409`: User with email already exists
+  - `500`: Internal server error
 
-### Order Endpoints
-- `GET /api/orders` - Get user orders
-- `POST /api/orders` - Create new order
-- `GET /api/orders/:id` - Get order by ID
-- `PUT /api/orders/:id` - Update order status
+#### User Login
+- **POST** `/user/login`
+- **Description**: Authenticate user and login
+- **Request Body**:
+  ```json
+  {
+    "email": "john@example.com",
+    "password": "password123"
+  }
+  ```
+- **Success Response** (200):
+  ```json
+  {
+    "success": true,
+    "message": "Login successful!",
+    "data": {
+      "id": 1,
+      "fullname": "John Doe",
+      "email": "john@example.com",
+      "created_at": "2025-09-21T17:15:03.000Z"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: Missing required fields or invalid email format
+  - `401`: Invalid email or password
+  - `500`: Internal server error
 
 ### System Endpoints
-- `GET /` - Basic server info
-- `GET /health` - Health check and database status
 
-For detailed API documentation, visit `/api/docs` when the server is running.
+#### Health Check
+- **GET** `/health`
+- **Description**: Check server and database connectivity status
+- **Success Response** (200):
+  ```json
+  {
+    "status": "healthy",
+    "database": "connected",
+    "typescript": true,
+    "timestamp": "2025-09-21T17:15:03.000Z"
+  }
+  ```
+
+#### Server Info
+- **GET** `/`
+- **Description**: Basic server information
+- **Success Response** (200):
+  ```json
+  {
+    "message": "Hello World from Node.js with MySQL and TypeScript!",
+    "database": "MySQL",
+    "status": "Server is running",
+    "typescript": true
+  }
+  ```
+
+### Future Endpoints (To be implemented)
+- `POST /user/logout` - User logout
+- `GET /user/profile` - Get user profile
+- `PUT /user/profile` - Update user profile
+- `GET /products` - Get all products
+- `POST /products` - Create new product (Admin)
+- `GET /orders` - Get user orders
+- `POST /orders` - Create new order
+
+For detailed API testing, you can use tools like Postman, Insomnia, or curl commands.
 
 ## 🗄️ Database Schema
 
@@ -216,40 +299,11 @@ For detailed API documentation, visit `/api/docs` when the server is running.
 ```sql
 CREATE TABLE users (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  username VARCHAR(50) UNIQUE NOT NULL,
+  fullname VARCHAR(100) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  role ENUM('user', 'admin') DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
-
-### Products Table
-```sql
-CREATE TABLE products (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  price DECIMAL(10, 2) NOT NULL,
-  stock_quantity INT DEFAULT 0,
-  category_id INT,
-  image_url VARCHAR(500),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
-
-### Orders Table
-```sql
-CREATE TABLE orders (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT NOT NULL,
-  total_amount DECIMAL(10, 2) NOT NULL,
-  status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 ```
 

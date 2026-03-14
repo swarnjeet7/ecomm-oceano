@@ -1,10 +1,13 @@
 {
-  "name": "ecomm-oceano",
+  "name": "oceano-frontend",
   "version": "1.0.0",
   "description": "This is e-commerce application for beginners those who are learning backend development. We are using Node.js, Express.js, MySQL, Microservices.",
+  "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -13,14 +16,29 @@
   "keywords": [
     "ecommerce",
     "fullstack",
-    "microservices",
-    "nodejs",
-    "expressjs",
-    "mysql"
+    "microservices"
   ],
   "author": "Swarnjeet Singh",
   "license": "MIT",
   "type": "module",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.5.0",
+    "@mui/material": "^6.5.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11"
+  },
   "bugs": {
     "url": "https://github.com/swarnjeet7/ecomm-oceano/issues"
   },
